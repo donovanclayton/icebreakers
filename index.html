@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Questions Game</title>
+  <style>
+    :root { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
+    body { margin: 0; background: #0f0f12; color: #f5f5f7; display: grid; place-items: center; min-height: 100vh; }
+    .card { width: min(680px, 92vw); background: #17171c; border: 1px solid #2a2a33; border-radius: 18px; padding: 22px; box-shadow: 0 8px 28px rgba(0,0,0,.35); }
+    h1 { margin: 0 0 12px 0; font-size: 24px; }
+    p.sub { margin: 0 0 18px 0; color: #bdbdc7; font-size: 14px; line-height: 1.5; white-space: pre-line; }
+    .controls { display: grid; grid-template-columns: 1fr; gap: 10px; margin: 12px 0 18px; }
+    .row { display: flex; gap: 10px; }
+    button, input[type="number"] {
+      font-size: 16px; border-radius: 12px; border: 1px solid #2a2a33; background: #1f1f26; color: #f5f5f7;
+      padding: 12px 14px; flex: 1 1 auto;
+    }
+    button { cursor: pointer; }
+    button:hover { background: #24242c; }
+    input[type="number"] { width: 120px; }
+    .question {
+      margin: 12px 0 6px; padding: 16px; background: #111116; border: 1px solid #2a2a33; border-radius: 12px;
+      font-size: 22px; line-height: 1.45; text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Welcome to the Questions Game!</h1>
+    <p class="sub">
+Instructions:
+1. Introduce yourself to the people you're playing with
+2. Ask the youngest person in the group to "Pick a number between 1 and 15" or "Give me a random question"
+3. Enter number/Choose randomly and select "Show this Question"
+4. Both/All players answer *thoughtfully*
+5. Next oldest choose a number between 1 and 15
+6. Repeat steps 3 - 5 until everyone has chosen a number
+    </p>
+
+    <div class="controls">
+      <div class="row">
+        <button id="randomBtn">Give me a random question</button>
+      </div>
+      <div class="row">
+        <input id="numInput" type="number" min="1" max="15" placeholder="Enter 1 to 15">
+        <button id="goBtn">Show this question</button>
+      </div>
+    </div>
+
+    <div class="question" id="questionBox">Your question will appear here.</div>
+  </div>
+
+  <script>
+    const questions = [
+      "What is your go to comfort food from your culture?",
+      "What kind of friend are you? (Bonus points: Answer for the different groups you might be in: at work, on a night out, on a vacation, etc.)",
+      "What could you teach a class on?",
+      "What is one word in your native language or dialect that makes you smile?",
+      "What song always gets you on the dancefloor?",
+      "What is the most memorable party, festival, or street celebration you have been to? (Bonus points: What was your favourite memory from a DJ Don event?)",
+      "Which tradition from your family or culture do you love the most?",
+      "Share a time you felt truly connected to your heritage.",
+      "What hometown dish does everyone have to try if they visit?",
+      "What is your best travel story? Follow up: What's your dream trip?",
+      "What song do you have on repeat right now?",
+      "What is your signature dance move? Show it if you are brave.",
+      "What are you newly obsessed with?",
+      "You can invite any artist, living or gone, to perform at your house party. Who is coming?",
+      "Your house, containing everything you own (minus any people or living things) catches fire. What one thing are you saving?"
+    ];
+
+    const qBox = document.getElementById("questionBox");
+    const numInput = document.getElementById("numInput");
+
+    // Do not show a question until user acts
+    function setQuestion(index) {
+      qBox.textContent = questions[index];
+    }
+
+    // No repeats when using Random until all 15 are used
+    const CYCLE_SIZE = 15; // equals questions.length
+    let deck = [];
+
+    function shuffle(arr) {
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    function buildDeck() {
+      const indices = [...Array(questions.length).keys()];
+      shuffle(indices);
+      const size = Math.min(CYCLE_SIZE, indices.length);
+      return indices.slice(0, size);
+    }
+
+    function nextRandomIndex() {
+      if (deck.length === 0) deck = buildDeck();
+      return deck.pop();
+    }
+
+    // Ensure the input reflects 1-15
+    numInput.setAttribute('max', questions.length);
+    numInput.setAttribute('placeholder', 'Enter 1 to ' + questions.length);
+
+    document.getElementById("randomBtn").addEventListener("click", () => {
+      setQuestion(nextRandomIndex());
+    });
+
+    document.getElementById("goBtn").addEventListener("click", () => {
+      const val = parseInt(numInput.value, 10);
+      if (Number.isInteger(val) && val >= 1 && val <= questions.length) {
+        setQuestion(val - 1);
+      } else {
+        alert("Enter a number between 1 and " + questions.length);
+      }
+    });
+
+    // No initial question shown by default
+  </script>
+</body>
+</html>
